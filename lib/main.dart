@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import './question.dart';
-import './answer.dart';
+
+import './quiz.dart';
+import './result.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,25 +14,45 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   var _questionIndex = 0;
-  final questions = [
+  var _totalScore = 0;
+  final _questions = [
     {
       'questionText': 'What\'s your favourite color?',
-      'answers': ['Black', 'Red', 'Green']
+      'answers': [
+        {'text': 'Black', 'score': 10},
+        {'text': 'Red', 'score': 5},
+        {'text': 'Green', 'score': 1}
+      ]
     },
     {
       'questionText': 'Whats\'s your favourite animal?',
-      'answers': ['Cat', 'Dog', 'Bird']
+      'answers': [
+        {'text': 'Cat', 'score': 10},
+        {'text': 'Dog', 'score': 5},
+        {'text': 'Bird', 'score': 1}
+      ]
     },
   ];
 
-  void _onAnswerQuestion() {
+  void _resetQuiz(){
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
+    });
+    
+  }
+
+  void _onAnswerQuestion(int score) {
+
+
     setState(() {
       _questionIndex = _questionIndex + 1;
+      _totalScore += score;
     });
 
     print(_questionIndex);
 
-    if (_questionIndex < questions.length) {
+    if (_questionIndex < _questions.length) {
       print('We have more questions!');
     } else {
       print('No more questions!');
@@ -45,19 +66,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('Flutter Workout App'),
         ),
-        body: _questionIndex < questions.length
-            ? Column(
-                children: [
-                  Question(questions[_questionIndex]['questionText']),
-                  ...(questions[_questionIndex]['answers'] as List<String>)
-                      .map((answer) {
-                    return Answer(_onAnswerQuestion, answer);
-                  }).toList(),
-                ],
+        body: _questionIndex < _questions.length
+            ? Quiz(
+                answerQuestion: _onAnswerQuestion,
+                questionIndex: _questionIndex,
+                questions: _questions,
               )
-            : Center(
-                child: Text('You dit it!'),
-              ),
+            : Result(_totalScore, _resetQuiz),
       ),
     ));
   }
